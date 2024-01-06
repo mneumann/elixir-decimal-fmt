@@ -20,6 +20,7 @@ defmodule DecimalFmt do
     formatter = &fmt_insn(&1, fmt_spec)
 
     number
+    |> DecimalFmt.DecimalRepr.with_precision(fmt_spec.precision, fmt_spec.fill_with_zeros)
     |> decimal_to_fmt_instructions(fmt_spec.chunk_every)
     |> Enum.reduce(<<>>, fn insn, acc -> acc <> formatter.(insn) end)
   end

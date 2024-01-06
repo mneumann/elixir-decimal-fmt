@@ -1,5 +1,7 @@
 defmodule DecimalFmt.FormatSpec do
   @type t() :: %__MODULE__{
+          precision: non_neg_integer() | nil,
+          fill_with_zeros: boolean(),
           chunk_every: pos_integer(),
           chunk_separator_integral: binary(),
           chunk_separator_fractional: binary(),
@@ -8,6 +10,8 @@ defmodule DecimalFmt.FormatSpec do
           trailing_zeros_end: binary()
         }
   defstruct [
+    :precision,
+    :fill_with_zeros,
     :chunk_every,
     :chunk_separator_integral,
     :chunk_separator_fractional,

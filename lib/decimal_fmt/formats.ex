@@ -1,5 +1,7 @@
 defmodule DecimalFmt.Formats do
   @default_fmt %DecimalFmt.FormatSpec{
+    precision: nil,
+    fill_with_zeros: false,
     chunk_every: 3,
     chunk_separator_integral: ",",
     chunk_separator_fractional: ",",

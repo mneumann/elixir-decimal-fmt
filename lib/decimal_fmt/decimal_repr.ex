@@ -18,6 +18,20 @@ defmodule DecimalFmt.DecimalRepr do
     end
   end
 
+  @spec with_precision(t(), non_neg_integer() | nil, boolean()) :: t()
+
+  def with_precision(decimal, nil, _fill_with_zeros) do
+    decimal
+  end
+
+  def with_precision({integral, fractional}, precision, false) when is_integer(precision) do
+    {integral, fractional |> Enum.take(precision)}
+  end
+
+  def with_precision({integral, fractional}, precision, true) when is_integer(precision) do
+    {integral, fractional |> Stream.concat(Stream.cycle([0])) |> Enum.take(precision)}
+  end
+
   defp char_to_digit(ch) when ch in ?0..?9, do: ch - ?0
   defp parse_digits(s), do: s |> to_charlist() |> Enum.map(&char_to_digit/1)
 end

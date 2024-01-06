@@ -50,6 +50,8 @@ defmodule DecimalFmtTest do
 
   test "it formats decimals" do
     format_spec = %DecimalFmt.FormatSpec{
+      precision: nil,
+      fill_with_zeros: false,
       chunk_every: 3,
       chunk_separator_integral: ",",
       chunk_separator_fractional: " ",
@@ -65,6 +67,24 @@ defmodule DecimalFmtTest do
                   DecimalFmt.fmt(
                     DecimalFmt.DecimalRepr.from_string("12345678.112233440000"),
                     format_spec
+                  )
+
+    auto_assert "12,345,678.123 456 7[0]" <-
+                  DecimalFmt.fmt(
+                    DecimalFmt.DecimalRepr.from_string("12345678.1234567"),
+                    %{format_spec | precision: 8, fill_with_zeros: true}
+                  )
+
+    auto_assert "12,345,678.123[ 00]" <-
+                  DecimalFmt.fmt(
+                    DecimalFmt.DecimalRepr.from_string("12345678.123"),
+                    %{format_spec | precision: 5, fill_with_zeros: true}
+                  )
+
+    auto_assert "12,345,678.123" <-
+                  DecimalFmt.fmt(
+                    DecimalFmt.DecimalRepr.from_string("12345678.123"),
+                    %{format_spec | precision: 5, fill_with_zeros: false}
                   )
   end
 end
