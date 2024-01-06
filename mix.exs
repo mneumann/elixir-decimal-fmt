@@ -7,6 +7,8 @@ defmodule DecimalFmt.MixProject do
       version: "0.1.0",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
+      description: description(),
+      package: package(),
       deps: deps()
     ]
   end
@@ -21,8 +23,23 @@ defmodule DecimalFmt.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:ex_doc, "~> 0.31.0", only: :dev},
+      {:mneme, "~> 0.4.3", only: [:dev, :test]}
+    ]
+  end
+
+  defp description() do
+    """
+    Advanced formatting of decimal numbers.
+    """
+  end
+
+  defp package() do
+    [
+      files: ["lib", "mix.exs", "README", "LICENSE"],
+      maintainers: ["Michael Neumann"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/mneumann/elixir-decimal-fmt"}
     ]
   end
 end
