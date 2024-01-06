@@ -8,21 +8,22 @@ defmodule DecimalFmt do
 
   ## Examples
 
-      iex> DecimalFmt.fmt({[1], [1,2,0]})
+      iex> DecimalFmt.fmt("1.120", :default)
       "1.120"
 
   """
-  def fmt(number) do
-    fmt(number, DecimalFmt.Formats.default())
+
+  def fmt(number, fmt_spec) when is_binary(number) do
+    fmt(number |> DecimalFmt.DecimalRepr.from_string(), fmt_spec)
   end
 
-  def fmt(number, fmt_spec) do
-    formatter = &fmt_insn(&1, fmt_spec)
+  def fmt(number, :default), do: fmt(number, DecimalFmt.Formats.default())
 
+  def fmt(number, fmt_spec) do
     number
     |> DecimalFmt.DecimalRepr.with_precision(fmt_spec.precision, fmt_spec.fill_with_zeros)
     |> decimal_to_fmt_instructions(fmt_spec.chunk_every)
-    |> Enum.reduce(<<>>, fn insn, acc -> acc <> formatter.(insn) end)
+    |> fmt_instructions(fmt_spec)
   end
 
   @type fmt_instruction() ::
@@ -32,6 +33,14 @@ defmodule DecimalFmt do
           | :fraction_separator
           | :trailing_zeros_start
           | :trailing_zeros_end
+
+  @spec fmt_instructions([fmt_instruction()], DecimalFmt.FormatSpec.t()) :: binary()
+  defp fmt_instructions(instructions, fmt_spec) do
+    formatter = &fmt_insn(&1, fmt_spec)
+
+    instructions
+    |> Enum.reduce(<<>>, fn insn, acc -> acc <> formatter.(insn) end)
+  end
 
   @spec fmt_insn(fmt_instruction(), DecimalFmt.FormatSpec.t()) :: binary()
   defp fmt_insn(insn, _fmt_spec) when is_integer(insn), do: to_string(insn)
