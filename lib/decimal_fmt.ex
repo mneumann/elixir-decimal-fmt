@@ -22,7 +22,7 @@ defmodule DecimalFmt do
     do: fmt!(number |> DecimalRepr.from_string(), fmt_spec)
 
   def fmt!(number, fmt_spec) when is_float(number) and number >= 0.0,
-    do: fmt!(number |> to_string(), fmt_spec)
+    do: fmt!(number |> :erlang.float_to_binary(decimals: fmt_spec.precision), fmt_spec)
 
   def fmt!(number, fmt_spec) when is_integer(number) and number > 0,
     do: fmt!(number |> to_string(), fmt_spec)
