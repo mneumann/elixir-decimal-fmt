@@ -62,28 +62,28 @@ defmodule DecimalFmtTest do
     }
 
     auto_assert "1.12[0]" <-
-                  DecimalFmt.fmt(DecimalRepr.from_string("1.120"), format_spec)
+                  DecimalFmt.fmt!(DecimalRepr.from_string("1.120"), format_spec)
 
     auto_assert "12,345,678.112 233 44[0 000]" <-
-                  DecimalFmt.fmt(
+                  DecimalFmt.fmt!(
                     "12345678.112233440000",
                     format_spec
                   )
 
     auto_assert "12,345,678.123 456 7[0]" <-
-                  DecimalFmt.fmt(
+                  DecimalFmt.fmt!(
                     "12345678.1234567",
                     %{format_spec | precision: 8, fill_with_zeros: true}
                   )
 
     auto_assert "12,345,678.123[ 00]" <-
-                  DecimalFmt.fmt(
+                  DecimalFmt.fmt!(
                     "12345678.123",
                     %{format_spec | precision: 5, fill_with_zeros: true}
                   )
 
     auto_assert "12,345,678.123" <-
-                  DecimalFmt.fmt(
+                  DecimalFmt.fmt!(
                     "12345678.123",
                     %{format_spec | precision: 5, fill_with_zeros: false}
                   )

@@ -3,25 +3,35 @@ defmodule DecimalFmt do
   Documentation for `DecimalFmt`.
   """
 
+  alias DecimalFmt.{DecimalRepr, FormatSpec, Formats}
+
   @doc """
-  Formats the decimal number of the default format spec.
+  Formats the decimal number according to the given format spec.
 
   ## Examples
 
-      iex> DecimalFmt.fmt("1.120", :default)
+      iex> DecimalFmt.fmt!("1.120", :default)
       "1.120"
 
   """
 
-  def fmt(number, fmt_spec) when is_binary(number) do
-    fmt(number |> DecimalFmt.DecimalRepr.from_string(), fmt_spec)
-  end
+  @spec fmt!(String.t() | float() | non_neg_integer(), FormatSpec.t() | :default) ::
+          String.t()
 
-  def fmt(number, :default), do: fmt(number, DecimalFmt.Formats.default())
+  def fmt!(number, fmt_spec) when is_binary(number),
+    do: fmt!(number |> DecimalRepr.from_string(), fmt_spec)
 
-  def fmt(number, fmt_spec) do
+  def fmt!(number, fmt_spec) when is_float(number) and number >= 0.0,
+    do: fmt!(number |> to_string(), fmt_spec)
+
+  def fmt!(number, fmt_spec) when is_integer(number) and number > 0,
+    do: fmt!(number |> to_string(), fmt_spec)
+
+  def fmt!(number, :default), do: fmt!(number, Formats.default())
+
+  def fmt!(number, fmt_spec) do
     number
-    |> DecimalFmt.DecimalRepr.with_precision(fmt_spec.precision, fmt_spec.fill_with_zeros)
+    |> DecimalRepr.with_precision(fmt_spec.precision, fmt_spec.fill_with_zeros)
     |> decimal_to_fmt_instructions(fmt_spec.chunk_every)
     |> fmt_instructions(fmt_spec)
   end
@@ -34,7 +44,7 @@ defmodule DecimalFmt do
           | :trailing_zeros_start
           | :trailing_zeros_end
 
-  @spec fmt_instructions([fmt_instruction()], DecimalFmt.FormatSpec.t()) :: binary()
+  @spec fmt_instructions([fmt_instruction()], FormatSpec.t()) :: binary()
   defp fmt_instructions(instructions, fmt_spec) do
     formatter = &fmt_insn(&1, fmt_spec)
 
@@ -42,11 +52,11 @@ defmodule DecimalFmt do
     |> Enum.reduce(<<>>, fn insn, acc -> acc <> formatter.(insn) end)
   end
 
-  @spec fmt_insn(fmt_instruction(), DecimalFmt.FormatSpec.t()) :: binary()
+  @spec fmt_insn(fmt_instruction(), FormatSpec.t()) :: binary()
   defp fmt_insn(insn, _fmt_spec) when is_integer(insn), do: to_string(insn)
   defp fmt_insn(insn, fmt_spec) when is_atom(insn), do: Map.get(fmt_spec, insn)
 
-  @spec decimal_to_fmt_instructions(DecimalFmt.DecimalRepr.t(), pos_integer()) ::
+  @spec decimal_to_fmt_instructions(DecimalRepr.t(), pos_integer()) ::
           nonempty_list(fmt_instruction())
 
   def decimal_to_fmt_instructions({[_ | _] = integral, fractional}, chunk_every) do
