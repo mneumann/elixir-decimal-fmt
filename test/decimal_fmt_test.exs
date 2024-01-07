@@ -19,36 +19,6 @@ defmodule DecimalFmtTest do
     auto_assert_raise FunctionClauseError, DecimalRepr.from_string("1.2a")
   end
 
-  test "it converts decimal into format instructions" do
-    auto_assert [1, :fraction_separator, 1, 2, :trailing_zeros_start, 0, :trailing_zeros_end] <-
-                  DecimalFmt.decimal_to_fmt_instructions({[1], [1, 2, 0]}, 3)
-
-    auto_assert [1] <- DecimalFmt.decimal_to_fmt_instructions({[1], []}, 3)
-
-    auto_assert [
-                  1,
-                  :chunk_separator_integral,
-                  2,
-                  3,
-                  4,
-                  :chunk_separator_integral,
-                  5,
-                  6,
-                  7,
-                  :fraction_separator,
-                  0,
-                  0,
-                  1,
-                  :chunk_separator_fractional,
-                  2,
-                  3
-                ] <-
-                  DecimalFmt.decimal_to_fmt_instructions(
-                    {[1, 2, 3, 4, 5, 6, 7], [0, 0, 1, 2, 3]},
-                    3
-                  )
-  end
-
   test "it formats decimals" do
     format_spec = %DecimalFmt.FormatSpec{
       precision: nil,

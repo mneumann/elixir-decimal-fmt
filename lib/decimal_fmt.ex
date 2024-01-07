@@ -59,7 +59,7 @@ defmodule DecimalFmt do
   @spec decimal_to_fmt_instructions(DecimalRepr.t(), pos_integer()) ::
           nonempty_list(fmt_instruction())
 
-  def decimal_to_fmt_instructions({[_ | _] = integral, fractional}, chunk_every) do
+  defp decimal_to_fmt_instructions({[_ | _] = integral, fractional}, chunk_every) do
     integral_insn =
       integral
       |> Enum.reverse()
