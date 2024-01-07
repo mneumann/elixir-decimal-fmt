@@ -32,17 +32,17 @@ defmodule DecimalFmt do
   def fmt!(number, fmt_spec) do
     number
     |> DecimalRepr.with_precision(fmt_spec.precision, fmt_spec.fill_with_zeros)
-    |> decimal_to_fmt_instructions(fmt_spec.chunk_every)
+    |> decimal_to_fmt_instructions(fmt_spec.group_digits)
     |> fmt_instructions(fmt_spec)
   end
 
   @type fmt_instruction() ::
           0..9
-          | :chunk_separator_integral
-          | :chunk_separator_fractional
+          | :integral_group_separator
+          | :fraction_group_separator
           | :fraction_separator
-          | :trailing_zeros_start
-          | :trailing_zeros_end
+          | :trailing_zeros_start_marker
+          | :trailing_zeros_end_marker
 
   @spec fmt_instructions([fmt_instruction()], FormatSpec.t()) :: binary()
   defp fmt_instructions(instructions, fmt_spec) do
@@ -59,21 +59,25 @@ defmodule DecimalFmt do
   @spec decimal_to_fmt_instructions(DecimalRepr.t(), pos_integer()) ::
           nonempty_list(fmt_instruction())
 
-  defp decimal_to_fmt_instructions({[_ | _] = integral, fractional}, chunk_every) do
+  defp decimal_to_fmt_instructions({[_ | _] = integral, fractional}, group_digits) do
     integral_insn =
       integral
       |> Enum.reverse()
-      |> Enum.chunk_every(chunk_every)
-      |> Enum.intersperse(:chunk_separator_integral)
+      |> Enum.chunk_every(group_digits)
+      |> Enum.intersperse(:integral_group_separator)
       |> List.flatten()
       |> Enum.reverse()
 
     fractional_insn =
       fractional
-      |> Enum.chunk_every(chunk_every)
-      |> Enum.intersperse(:chunk_separator_fractional)
+      |> Enum.chunk_every(group_digits)
+      |> Enum.intersperse(:fraction_group_separator)
       |> List.flatten()
-      |> mark_trailing(&zero_or_instruction/1, :trailing_zeros_start, :trailing_zeros_end)
+      |> mark_trailing(
+        &zero_or_instruction/1,
+        :trailing_zeros_start_marker,
+        :trailing_zeros_end_marker
+      )
 
     case fractional_insn do
       [] -> integral_insn

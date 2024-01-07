@@ -23,12 +23,12 @@ defmodule DecimalFmtTest do
     format_spec = %DecimalFmt.FormatSpec{
       precision: nil,
       fill_with_zeros: false,
-      chunk_every: 3,
-      chunk_separator_integral: ",",
-      chunk_separator_fractional: " ",
+      group_digits: 3,
+      integral_group_separator: ",",
+      fraction_group_separator: " ",
       fraction_separator: ".",
-      trailing_zeros_start: "[",
-      trailing_zeros_end: "]"
+      trailing_zeros_start_marker: "[",
+      trailing_zeros_end_marker: "]"
     }
 
     auto_assert "1.12[0]" <-
